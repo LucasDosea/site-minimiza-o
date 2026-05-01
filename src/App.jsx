@@ -1553,7 +1553,7 @@ function NotebookPreviewAnimation({ palette }) {
         className="hide-on-mobile-anim"
         style={{
           position: "absolute",
-          top: "56%",
+          top: "43%",
           right: "2%",
           width: 520,
           opacity: 0.38,
