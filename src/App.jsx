@@ -4539,6 +4539,20 @@ function LimitesDemo({ palette }) {
 // DEMONSTRAÇÃO PRÁTICA DE INTEGRAÇÃO (input CPF → resultado)
 // ============================================
 function DemonstracaoPratica({ palette }) {
+  const sessaoAtiva = {
+    usuario: "Ana Paula Santos",
+    login: "ana.santos.semed",
+    cargo: "Auxiliar de Secretaria Escolar",
+    unidade: "Escola Municipal João Alves Filho",
+    matricula: "SEMED-004829",
+    ip: "200.150.42.18",
+    dispositivo: "Secretaria-PC-03",
+  };
+
+  const finalidadeAtual = "Matrícula escolar";
+  const dadosBloqueados = ["Histórico clínico", "Doenças", "Alergias", "Medicamentos", "Prontuário", "Exportação em massa"];
+  const agoraCurta = () => new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
   const [step, setStep] = useState(0); // 0: input, 1: processando, 2: resultado, 3: agendando, 4: confirmado
   const [resultado, setResultado] = useState(null);
   const [vacinasState, setVacinasState] = useState([]); // estado dinâmico das vacinas (pra atualizar após agendamento)
@@ -4551,6 +4565,18 @@ function DemonstracaoPratica({ palette }) {
   const [horaSelecionada, setHoraSelecionada] = useState(null);
   const [protocolo, setProtocolo] = useState(null);
   const [cpfInput, setCpfInput] = useState("");
+  const [acessoIndevido, setAcessoIndevido] = useState(null);
+  const [orientacaoResponsavel, setOrientacaoResponsavel] = useState(false);
+  const [auditEventos, setAuditEventos] = useState([
+    { ts: "sessão", tipo: "login", texto: "Sessão institucional autenticada", detalhe: "Usuário, unidade, IP e dispositivo registrados.", cor: palette.primary },
+  ]);
+
+  const registrarEvento = (tipo, texto, detalhe, cor = palette.primary) => {
+    setAuditEventos((prev) => [
+      { ts: agoraCurta(), tipo, texto, detalhe, cor },
+      ...prev.slice(0, 5),
+    ]);
+  };
 
   const exemplos = [
     {
@@ -4618,9 +4644,9 @@ function DemonstracaoPratica({ palette }) {
   ];
 
   const ubsOptions = [
-    { nome: "UBS Augusto Franco", endereco: "Av. Augusto Franco, 3115 · Ponto Novo", distancia: "1.2 km" },
-    { nome: "UBS Atalaia", endereco: "R. Pedro Calazans, 458 · Atalaia", distancia: "2.4 km" },
-    { nome: "UBS Centro", endereco: "Praça Camerino, 230 · Centro", distancia: "3.8 km" },
+    { nome: "UBS Augusto Franco", endereco: "Av. Augusto Franco, 3115 · Ponto Novo", distancia: "1.2 km", tempo: "8 min", vacinaDisponivel: true, territorio: "compatível", horarios: 6, proxima: true },
+    { nome: "UBS Atalaia", endereco: "R. Pedro Calazans, 458 · Atalaia", distancia: "2.4 km", tempo: "14 min", vacinaDisponivel: true, territorio: "compatível", horarios: 4, proxima: false },
+    { nome: "UBS Centro", endereco: "Praça Camerino, 230 · Centro", distancia: "3.8 km", tempo: "18 min", vacinaDisponivel: true, territorio: "referência alternativa", horarios: 3, proxima: false },
   ];
 
   const horarios = [
@@ -4698,6 +4724,8 @@ function DemonstracaoPratica({ palette }) {
     };
 
     setCpfInput(somenteNumeros(cpf));
+    setAcessoIndevido(null);
+    setOrientacaoResponsavel(false);
     setStep(1);
     setTimeout(() => {
       setResultado(found);
@@ -4705,6 +4733,12 @@ function DemonstracaoPratica({ palette }) {
       setStatusState(found.status);
       setStatusColorState(found.statusColor);
       setOrientacaoState(found.orientacao);
+      registrarEvento(
+        "consulta",
+        `CPF consultado para ${finalidadeAtual.toLowerCase()}`,
+        `Retorno mínimo: ${found.status} · CPF mascarado: ***.***.${somenteNumeros(cpf).slice(6, 9)}-${somenteNumeros(cpf).slice(9, 11)}`,
+        found.statusColor
+      );
       setStep(2);
     }, 1400);
   };
@@ -4722,9 +4756,15 @@ function DemonstracaoPratica({ palette }) {
     setHoraSelecionada(null);
     setProtocolo(null);
     setCpfInput("");
+    setAcessoIndevido(null);
+    setOrientacaoResponsavel(false);
+    setAuditEventos([
+      { ts: "sessão", tipo: "login", texto: "Sessão institucional autenticada", detalhe: "Usuário, unidade, IP e dispositivo registrados.", cor: palette.primary },
+    ]);
   };
 
   const iniciarAgendamento = () => {
+    registrarEvento("encaminhamento", "Fluxo de agendamento iniciado", "Sistema sugeriu UBS por distância, território e disponibilidade de vacina.", palette.warn);
     setStep(3);
     setAgendamentoStep(0);
   };
@@ -4737,7 +4777,7 @@ function DemonstracaoPratica({ palette }) {
     setHoraSelecionada(null);
   };
 
-  const confirmarAgendamento = () => {
+  const confirmarAgendamento = (horaEscolhida = horaSelecionada) => {
     setAgendamentoStep(3); // loading
     setTimeout(() => {
       // Gera protocolo
@@ -4745,7 +4785,7 @@ function DemonstracaoPratica({ palette }) {
       setProtocolo(proto);
 
       // ATUALIZA AS VACINAS EM TEMPO REAL (a vacina em atraso vira agendada)
-      const dataFmt = `${dataSelecionada.dia}/${String(dataSelecionada.date.getMonth() + 1).padStart(2, "0")} às ${horaSelecionada}`;
+      const dataFmt = `${dataSelecionada.dia}/${String(dataSelecionada.date.getMonth() + 1).padStart(2, "0")} às ${horaEscolhida}`;
       const vacinasAtualizadas = vacinasState.map(v => {
         if (v.status === "atrasado") {
           return { ...v, status: "agendado", data: `Agendada · ${dataFmt}` };
@@ -4758,6 +4798,7 @@ function DemonstracaoPratica({ palette }) {
       setStatusState("AGENDADO");
       setStatusColorState(palette.primary);
       setOrientacaoState(`Agendamento confirmado em ${ubsSelecionada.nome} para ${dataFmt}. Matrícula liberada com compromisso registrado.`);
+      registrarEvento("protocolo", `Protocolo ${proto} gerado`, `${ubsSelecionada.nome} · ${dataFmt} · responsável orientado.`, palette.success);
 
       setStep(4);
     }, 1400);
@@ -4769,7 +4810,23 @@ function DemonstracaoPratica({ palette }) {
     atrasado: { color: palette.danger, icon: "✗", label: "Em atraso" },
   };
 
+  const simularAcessoIndevido = () => {
+    const tentativa = {
+      titulo: "Tentativa fora do escopo detectada",
+      usuario: sessaoAtiva.login,
+      cargo: sessaoAtiva.cargo,
+      acao: "Acessar histórico clínico completo",
+      finalidade: finalidadeAtual,
+      risco: "ALTO",
+      motivo: "Perfil escolar pode consultar status vacinal, mas não prontuário, doenças, alergias ou medicamentos.",
+      hash: `EV-${Math.random().toString(16).slice(2, 10).toUpperCase()}`,
+    };
+    setAcessoIndevido(tentativa);
+    registrarEvento("bloqueio", tentativa.titulo, `${tentativa.acao} · ${tentativa.risco} · evidência ${tentativa.hash}`, palette.danger);
+  };
+
   const podeAgendar = statusState && statusState !== "LIBERADO";
+  const ubsSugerida = ubsOptions.find((ubs) => ubs.proxima) || ubsOptions[0];
 
   return (
     <SectionWrap palette={palette} id="demonstracao">
@@ -4821,6 +4878,32 @@ function DemonstracaoPratica({ palette }) {
               <p style={{ fontSize: 14, color: palette.textMuted, marginBottom: 28, lineHeight: 1.6, position: "relative" }}>
                 Esta tela simula a entrada real no balcão da secretaria. O CPF é digitado, transformado em token seguro e a escola recebe apenas o status necessário — sem prontuário, doenças ou histórico clínico.
               </p>
+
+              {/* Sessão institucional + finalidade declarada */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, marginBottom: 22, position: "relative" }}>
+                <div style={{ padding: 16, background: palette.bg, border: `1px solid ${palette.border}`, borderRadius: 14 }}>
+                  <div className="mono-font" style={{ fontSize: 9, color: palette.primary, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 10 }}>
+                    ─ SESSÃO ATIVA
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{sessaoAtiva.usuario}</div>
+                  <div style={{ fontSize: 12, color: palette.textMuted, lineHeight: 1.5 }}>{sessaoAtiva.cargo}<br />{sessaoAtiva.unidade}</div>
+                  <div className="mono-font" style={{ fontSize: 10, color: palette.textMuted, marginTop: 10, lineHeight: 1.6 }}>
+                    matrícula: {sessaoAtiva.matricula}<br />ip: {sessaoAtiva.ip}<br />dispositivo: {sessaoAtiva.dispositivo}
+                  </div>
+                </div>
+                <div style={{ padding: 16, background: `${palette.primary}0f`, border: `1px solid ${palette.primary}55`, borderRadius: 14 }}>
+                  <div className="mono-font" style={{ fontSize: 9, color: palette.primary, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 10 }}>
+                    ─ FINALIDADE DECLARADA
+                  </div>
+                  <div className="display-font" style={{ fontSize: 22, fontWeight: 600, marginBottom: 8 }}>{finalidadeAtual}</div>
+                  <div style={{ fontSize: 12, color: palette.textMuted, lineHeight: 1.6 }}>
+                    O sistema valida <strong style={{ color: palette.text }}>perfil + finalidade + dado solicitado</strong> antes de retornar qualquer informação.
+                  </div>
+                  <div className="mono-font" style={{ marginTop: 10, fontSize: 10, color: palette.success, letterSpacing: "0.12em", fontWeight: 700 }}>
+                    PERMITIDO: status vacinal mínimo
+                  </div>
+                </div>
+              </div>
 
               <div style={{
                 position: "relative",
@@ -5130,10 +5213,63 @@ function DemonstracaoPratica({ palette }) {
                     </div>
                   </div>
                   <div style={{ fontSize: 12, color: palette.textMuted, lineHeight: 1.5 }}>
-                    Comprovante enviado<br/>ao app da família
+                    {ubsSelecionada?.nome}<br />{dataSelecionada?.dia}/{String((dataSelecionada?.date?.getMonth?.() ?? 0) + 1).padStart(2, "0")} · {horaSelecionada}
                   </div>
+                  <button
+                    onClick={() => setOrientacaoResponsavel(true)}
+                    style={{
+                      padding: "10px 14px",
+                      background: orientacaoResponsavel ? palette.success : palette.primary,
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 10,
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      cursor: "pointer",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {orientacaoResponsavel ? "Responsável orientado ✓" : "Enviar orientação"}
+                  </button>
                 </motion.div>
               )}
+
+              {/* Motor de decisão + política de minimização */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12, marginBottom: 16 }}>
+                <div style={{ padding: 18, background: palette.surface, border: `1px solid ${palette.border}`, borderRadius: 16 }}>
+                  <div className="mono-font" style={{ fontSize: 9, color: palette.primary, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 10 }}>
+                    ─ MOTOR DE DECISÃO
+                  </div>
+                  {[
+                    "CPF recebido → token pseudonimizado",
+                    `Finalidade validada → ${finalidadeAtual}`,
+                    `Perfil validado → ${sessaoAtiva.cargo}`,
+                    `Retorno permitido → ${statusState}`,
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: palette.textMuted, lineHeight: 1.6, marginBottom: 6 }}>
+                      <Check size={13} color={palette.success} style={{ marginTop: 2, flexShrink: 0 }} />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding: 18, background: palette.surface, border: `1px solid ${palette.border}`, borderRadius: 16 }}>
+                  <div className="mono-font" style={{ fontSize: 9, color: palette.success, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 10 }}>
+                    ─ A ESCOLA RECEBE
+                  </div>
+                  {["Status vacinal", "Orientação de matrícula", "Encaminhamento para UBS", "Protocolo, se houver agendamento"].map((item, i) => (
+                    <div key={i} style={{ fontSize: 12, color: palette.text, marginBottom: 7 }}>✓ {item}</div>
+                  ))}
+                </div>
+                <div style={{ padding: 18, background: palette.surface, border: `1px solid ${palette.border}`, borderRadius: 16 }}>
+                  <div className="mono-font" style={{ fontSize: 9, color: palette.danger, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 10 }}>
+                    ─ A ESCOLA NÃO RECEBE
+                  </div>
+                  {dadosBloqueados.slice(0, 5).map((item, i) => (
+                    <div key={i} style={{ fontSize: 12, color: palette.textMuted, marginBottom: 7 }}>× {item}</div>
+                  ))}
+                </div>
+              </div>
 
               {/* Grid de duas visões */}
               <div className="visao-dupla-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -5319,6 +5455,64 @@ function DemonstracaoPratica({ palette }) {
                 </motion.div>
               </div>
 
+              {/* Segurança operacional: testar acesso indevido + trilha do protótipo */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginTop: 16 }}>
+                <div style={{ padding: 20, background: palette.surface, border: `1px solid ${acessoIndevido ? palette.danger : palette.border}`, borderRadius: 16 }}>
+                  <div className="mono-font" style={{ fontSize: 10, color: palette.danger, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 10 }}>
+                    ─ TESTE DE ACESSO INDEVIDO
+                  </div>
+                  <p style={{ fontSize: 13, color: palette.textMuted, lineHeight: 1.6, margin: "0 0 14px" }}>
+                    Simula um servidor escolar tentando abrir prontuário completo. O sistema deve bloquear e registrar evidência.
+                  </p>
+                  <button
+                    onClick={simularAcessoIndevido}
+                    style={{
+                      width: "100%",
+                      padding: "12px 14px",
+                      borderRadius: 12,
+                      border: `1px solid ${palette.danger}`,
+                      background: acessoIndevido ? palette.danger + "18" : "transparent",
+                      color: palette.danger,
+                      cursor: "pointer",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      fontSize: 11,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Testar acesso indevido
+                  </button>
+                  {acessoIndevido && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginTop: 14, padding: 14, borderRadius: 12, background: palette.danger + "10", borderLeft: `3px solid ${palette.danger}` }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: palette.danger, marginBottom: 6 }}>{acessoIndevido.titulo}</div>
+                      <div style={{ fontSize: 12, color: palette.textMuted, lineHeight: 1.6 }}>
+                        Usuário: <strong style={{ color: palette.text }}>{acessoIndevido.usuario}</strong><br />
+                        Ação: <strong style={{ color: palette.text }}>{acessoIndevido.acao}</strong><br />
+                        Risco: <strong style={{ color: palette.danger }}>{acessoIndevido.risco}</strong><br />
+                        Evidência: <strong style={{ color: palette.text }}>{acessoIndevido.hash}</strong>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+
+                <div style={{ padding: 20, background: palette.surface, border: `1px solid ${palette.border}`, borderRadius: 16 }}>
+                  <div className="mono-font" style={{ fontSize: 10, color: palette.accent, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 10 }}>
+                    ─ TRILHA DO PROTÓTIPO
+                  </div>
+                  <div style={{ display: "grid", gap: 8, maxHeight: 220, overflowY: "auto" }}>
+                    {auditEventos.map((ev, i) => (
+                      <div key={`${ev.ts}-${i}`} style={{ padding: "10px 12px", background: palette.bg, borderRadius: 10, borderLeft: `3px solid ${ev.cor}` }}>
+                        <div className="mono-font" style={{ fontSize: 9, color: ev.cor, letterSpacing: "0.16em", marginBottom: 4, textTransform: "uppercase", fontWeight: 800 }}>
+                          {ev.ts} · {ev.tipo}
+                        </div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: palette.text, marginBottom: 2 }}>{ev.texto}</div>
+                        <div style={{ fontSize: 11, color: palette.textMuted, lineHeight: 1.4 }}>{ev.detalhe}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               {/* Botão de Agendamento (aparece se status != LIBERADO e ainda não agendou) */}
               {podeAgendar && step === 2 && (
                 <motion.div
@@ -5426,9 +5620,36 @@ function DemonstracaoPratica({ palette }) {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                   >
-                    <h3 className="display-font" style={{ fontSize: 24, fontWeight: 500, margin: "0 0 20px", letterSpacing: "-0.02em" }}>
+                    <h3 className="display-font" style={{ fontSize: 24, fontWeight: 500, margin: "0 0 10px", letterSpacing: "-0.02em" }}>
                       Escolha a UBS mais próxima
                     </h3>
+                    <div style={{ padding: 16, background: `${palette.primary}0f`, border: `1px solid ${palette.primary}55`, borderRadius: 14, marginBottom: 16 }}>
+                      <div className="mono-font" style={{ fontSize: 9, color: palette.primary, letterSpacing: "0.22em", fontWeight: 800, marginBottom: 8 }}>
+                        ─ UBS MAIS PRÓXIMA SUGERIDA AUTOMATICAMENTE
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                        <div>
+                          <div style={{ fontSize: 15, fontWeight: 800 }}>{ubsSugerida.nome}</div>
+                          <div style={{ fontSize: 12, color: palette.textMuted, marginTop: 3 }}>{ubsSugerida.endereco}</div>
+                        </div>
+                        <div className="mono-font" style={{ fontSize: 11, color: palette.primary, fontWeight: 800, letterSpacing: "0.1em" }}>
+                          {ubsSugerida.distancia} · {ubsSugerida.tempo}
+                        </div>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8, marginTop: 12 }}>
+                        {[
+                          ["Critério", "menor distância"],
+                          ["Vacina", ubsSugerida.vacinaDisponivel ? "disponível" : "verificar"],
+                          ["Território", ubsSugerida.territorio],
+                          ["Horários", `${ubsSugerida.horarios} livres`],
+                        ].map(([label, value]) => (
+                          <div key={label} style={{ padding: "8px 10px", background: palette.surface, borderRadius: 10, border: `1px solid ${palette.border}` }}>
+                            <div className="mono-font" style={{ fontSize: 8, color: palette.textMuted, letterSpacing: "0.16em", marginBottom: 3 }}>{label}</div>
+                            <div style={{ fontSize: 11, fontWeight: 700 }}>{value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     <div style={{ display: "grid", gap: 10 }}>
                       {ubsOptions.map((ubs, i) => (
                         <button
@@ -5455,11 +5676,21 @@ function DemonstracaoPratica({ palette }) {
                             <Heart size={18} strokeWidth={1.6} />
                           </div>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{ubs.nome}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 2 }}>
+                              <span style={{ fontSize: 14, fontWeight: 600 }}>{ubs.nome}</span>
+                              {ubs.proxima && (
+                                <span className="mono-font" style={{ fontSize: 8, color: "#fff", background: palette.primary, padding: "3px 7px", borderRadius: 999, letterSpacing: "0.12em", fontWeight: 800 }}>
+                                  MAIS PRÓXIMA
+                                </span>
+                              )}
+                            </div>
                             <div style={{ fontSize: 12, color: palette.textMuted }}>{ubs.endereco}</div>
+                            <div style={{ fontSize: 11, color: palette.textMuted, marginTop: 4 }}>
+                              Vacina disponível · território {ubs.territorio} · {ubs.horarios} horários livres
+                            </div>
                           </div>
-                          <div className="mono-font" style={{ fontSize: 11, color: palette.primary, letterSpacing: "0.1em", fontWeight: 600 }}>
-                            {ubs.distancia}
+                          <div className="mono-font" style={{ fontSize: 11, color: palette.primary, letterSpacing: "0.1em", fontWeight: 600, textAlign: "right" }}>
+                            {ubs.distancia}<br />{ubs.tempo}
                           </div>
                         </button>
                       ))}
@@ -5542,7 +5773,7 @@ function DemonstracaoPratica({ palette }) {
                             return (
                               <button
                                 key={j}
-                                onClick={() => { if (!ocupado) { setHoraSelecionada(slot); confirmarAgendamento(); } }}
+                                onClick={() => { if (!ocupado) { setHoraSelecionada(slot); confirmarAgendamento(slot); } }}
                                 disabled={ocupado}
                                 style={{
                                   padding: "12px 8px",
