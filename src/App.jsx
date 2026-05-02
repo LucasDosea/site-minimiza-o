@@ -2583,8 +2583,9 @@ function FocusGallery({ palette }) {
 function FluxoSolucao({ palette }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
+  const [hoveredStep, setHoveredStep] = useState(null);
 
-  const passos = [
+  const passos = 
     { label: "Família", sub: "Cidadão com vacinação em dia ou não", icon: Users },
     { label: "UBS / Saúde", sub: "Registra ou valida dose aplicada", icon: Heart },
     { label: "Banco pseudonimizado", sub: "Calcula status objetivo", icon: Database },
@@ -2613,20 +2614,39 @@ function FluxoSolucao({ palette }) {
               <React.Fragment key={i}>
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: i * 0.15 }}
+                  animate={inView ? {
+                    opacity: 1,
+                    y: hoveredStep === i ? -5 : 0,
+                    scale: hoveredStep === i ? 1.018 : 1,
+                    boxShadow: hoveredStep === i ? `0 18px 38px -24px ${palette.primary}` : "0 0 0 rgba(0,0,0,0)",
+                  } : {}}
+                  transition={{ duration: 0.35, delay: hoveredStep === null ? i * 0.15 : 0, ease: [0.16, 1, 0.3, 1] }}
+                  onMouseEnter={() => setHoveredStep(i)}
+                  onMouseLeave={() => setHoveredStep(null)}
                   style={{
                     padding: 24,
                     background: palette.surface,
-                    border: `1px solid ${palette.border}`,
+                    border: `1px solid ${hoveredStep === i ? palette.primary + "55" : palette.border}`,
                     borderRadius: 16,
                     textAlign: "center",
                     position: "relative",
+                    cursor: "default",
+                    overflow: "hidden",
                   }}
                 >
                   <motion.div
-                    animate={inView ? { scale: [1, 1.15, 1] } : {}}
-                    transition={{ duration: 1.5, delay: i * 0.15 + 0.5, repeat: Infinity, repeatDelay: 4 }}
+                    animate={{ opacity: hoveredStep === i ? 1 : 0 }}
+                    transition={{ duration: 0.25 }}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: `linear-gradient(135deg, ${palette.primary}0f, transparent 65%)`,
+                      pointerEvents: "none",
+                    }}
+                  />
+                  <motion.div
+                    animate={{ scale: hoveredStep === i ? 1.08 : 1 }}
+                    transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                       width: 56,
                       height: 56,
@@ -2636,7 +2656,9 @@ function FluxoSolucao({ palette }) {
                       display: "grid",
                       placeItems: "center",
                       margin: "0 auto 16px",
-                      boxShadow: `0 10px 30px -10px ${palette.primary}`,
+                      boxShadow: hoveredStep === i ? `0 12px 34px -10px ${palette.primary}` : `0 10px 30px -14px ${palette.primary}`,
+                      position: "relative",
+                      zIndex: 1,
                     }}
                   >
                     <Icon size={24} />
