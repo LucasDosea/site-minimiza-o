@@ -203,9 +203,9 @@ function BigTypeTransition({ palette, word, subword }) {
         </div>
       </motion.div>
       <motion.div
-        style={{ opacity }}
         className="mono-font"
         style={{
+          opacity,
           position: "absolute",
           bottom: "20%",
           left: "50%",
@@ -279,8 +279,8 @@ function NavBar({ palette, theme, setTheme }) {
 
       <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
         <div style={{ display: "flex", gap: 24, fontSize: 13, color: palette.textMuted }} className="hide-mobile">
-          {["Solução", "Fluxo", "Dashboard", "LGPD"].map((item) => (
-            <a key={item} href={`#${item.toLowerCase().replace("ç", "c").replace("ã", "a").replace("ó", "o").replace("ú", "u")}`} style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.color = palette.text)} onMouseLeave={(e) => (e.currentTarget.style.color = palette.textMuted)}>
+          {["Solução", "Fluxo", "Dashboard", "Protótipo", "Auditoria", "LGPD"].map((item) => (
+            <a key={item} href={item === "Protótipo" ? "#demonstracao" : item === "Auditoria" ? "#auditoria" : `#${item.toLowerCase().replace("ç", "c").replace("ã", "a").replace("ó", "o").replace("ú", "u")}`} style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.color = palette.text)} onMouseLeave={(e) => (e.currentTarget.style.color = palette.textMuted)}>
               {item}
             </a>
           ))}
@@ -2358,7 +2358,6 @@ function SolucaoProposta({ palette }) {
                 cursor: "default",
               }}
               whileHover={{ y: -8, boxShadow: `0 30px 60px -20px ${palette.primary}33` }}
-              transition={{ duration: 0.3 }}
             >
               <div style={{
                 position: "absolute",
@@ -2585,7 +2584,7 @@ function FluxoSolucao({ palette }) {
   const inView = useInView(ref, { once: true, margin: "-50px" });
   const [hoveredStep, setHoveredStep] = useState(null);
 
-  const passos = 
+  const passos = [
     { label: "Família", sub: "Cidadão com vacinação em dia ou não", icon: Users },
     { label: "UBS / Saúde", sub: "Registra ou valida dose aplicada", icon: Heart },
     { label: "Banco pseudonimizado", sub: "Calcula status objetivo", icon: Database },
@@ -2830,6 +2829,49 @@ function DashboardExecutivo({ palette }) {
           </motion.div>
         ))}
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        style={{
+          marginTop: 28,
+          padding: 24,
+          background: palette.surface,
+          border: `1px solid ${palette.border}`,
+          borderRadius: 18,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 18 }}>
+          <div>
+            <div className="mono-font" style={{ fontSize: 10, color: palette.danger, letterSpacing: "0.25em", fontWeight: 700, marginBottom: 6 }}>
+              ─ ALERTAS DAS ÚLTIMAS 24H
+            </div>
+            <h3 className="display-font" style={{ fontSize: 24, fontWeight: 500, margin: 0 }}>
+              Governança operacional
+            </h3>
+          </div>
+          <span className="mono-font" style={{ fontSize: 10, color: palette.success, letterSpacing: "0.18em", padding: "6px 10px", background: palette.success + "18", borderRadius: 100 }}>
+            MONITORAMENTO ATIVO
+          </span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12 }}>
+          {[
+            { label: "Tentativas fora do escopo", value: "3", detail: "bloqueadas antes de retornar dado", color: palette.danger },
+            { label: "Extração em massa", value: "1", detail: "chave de API suspensa para revisão", color: palette.warn },
+            { label: "Consultas dentro da finalidade", value: "98%", detail: "matrícula escolar / status objetivo", color: palette.success },
+            { label: "Vazamentos detectados", value: "0", detail: "nenhum dado clínico exposto", color: palette.primary },
+          ].map((a, i) => (
+            <div key={i} style={{ padding: 16, background: palette.surfaceAlt, borderRadius: 12, borderLeft: `3px solid ${a.color}` }}>
+              <div className="display-font" style={{ fontSize: 28, fontWeight: 600, color: a.color, marginBottom: 6 }}>{a.value}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: palette.text, marginBottom: 4 }}>{a.label}</div>
+              <div style={{ fontSize: 12, color: palette.textMuted, lineHeight: 1.5 }}>{a.detail}</div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
     </SectionWrap>
   );
 }
@@ -3574,6 +3616,7 @@ function AuditoriaDemo({ palette, openPortal }) {
     { ts: "10:31", ubs: "UBS Augusto Franco", evento: "Hepatite B aplicada", cidadao: "***000.111**", protocolo: "VE-2026-3194" },
   ]);
   const [adding, setAdding] = useState(false);
+  const [showEvidence, setShowEvidence] = useState(false);
 
   // Atualiza relógio a cada segundo
   useEffect(() => {
@@ -3687,15 +3730,59 @@ function AuditoriaDemo({ palette, openPortal }) {
     },
   ];
 
-  const blockedDetails = activeBlocked || blockedScenarios[0];
+  const getBlockedMeta = (log) => {
+    const finalidade = log?.finalidade || "";
+    if (finalidade.includes("exportacao_massiva")) {
+      return {
+        risco: "CRÍTICO",
+        dispositivo: "API Gateway · client externo",
+        matricula: "API-TERC-019",
+        dpoAlerta: "Enviado ao Encarregado LGPD · prioridade crítica · revisão imediata",
+        evidenciaId: "EV-2026-0047",
+        hashEvento: "9d2f7a1c8e4b...",
+      };
+    }
+    if (finalidade.includes("fora_território") || finalidade.includes("dados_clinicos") || finalidade.includes("dados_escolares")) {
+      return {
+        risco: "ALTO",
+        dispositivo: "Desktop institucional autenticado",
+        matricula: "SERV-2026-1184",
+        dpoAlerta: "Enviado para auditoria interna · análise em até 24h",
+        evidenciaId: "EV-2026-0044",
+        hashEvento: "7f3a9b2e8c4d...",
+      };
+    }
+    if (finalidade.includes("endereço")) {
+      return {
+        risco: "MÉDIO",
+        dispositivo: "Desktop Direção 01",
+        matricula: "SEMED-2026-0712",
+        dpoAlerta: "Marcado para revisão do Encarregado LGPD",
+        evidenciaId: "EV-2026-0042",
+        hashEvento: "4c8e1b7a2f91...",
+      };
+    }
+    return {
+      risco: "ALTO",
+      dispositivo: "Desktop Secretaria 03",
+      matricula: "SEMED-2026-04829",
+      dpoAlerta: "Notificação enviada ao painel do Encarregado LGPD",
+      evidenciaId: "EV-2026-0041",
+      hashEvento: "7f3a9b2e8c4d...",
+    };
+  };
+
+  const blockedDetails = activeBlocked ? { ...activeBlocked, ...getBlockedMeta(activeBlocked) } : { ...blockedScenarios[0], ...getBlockedMeta(blockedScenarios[0]) };
 
   const simularBloqueio = () => {
     if (showBlocked) {
       setShowBlocked(false);
+      setShowEvidence(false);
       return;
     }
     const next = blockedScenarios[Math.floor(Math.random() * blockedScenarios.length)];
     setActiveBlocked(next);
+    setShowEvidence(false);
     setShowBlocked(true);
   };
 
@@ -3729,7 +3816,7 @@ function AuditoriaDemo({ palette, openPortal }) {
   const formatTime = (d) => d.toLocaleTimeString("pt-BR");
 
   return (
-    <SectionWrap palette={palette} animation={<AuditLogsAnimation palette={palette} />}>
+    <SectionWrap palette={palette} id="auditoria" animation={<AuditLogsAnimation palette={palette} />}>
       <SectionHeader
         palette={palette}
         kicker="Trilha de evidências"
@@ -3830,6 +3917,78 @@ function AuditoriaDemo({ palette, openPortal }) {
               {formatTime(liveTime)}
             </span>
           </div>
+        </div>
+
+        {/* Identidade da sessão + detecção de tentativa fora do escopo */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: showBlocked ? "1fr 1.15fr" : "1fr",
+          gap: 14,
+          marginBottom: 18,
+        }}>
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{
+              padding: 18,
+              background: palette.surface,
+              border: `1px solid ${palette.border}`,
+              borderRadius: 14,
+            }}
+          >
+            <div className="mono-font" style={{ fontSize: 9, color: palette.primary, letterSpacing: "0.25em", fontWeight: 700, marginBottom: 12 }}>
+              ─ SESSÃO INSTITUCIONAL AUTENTICADA
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+              {[
+                { label: "Usuário", value: showBlocked ? blockedDetails.agenteNome : "secescolar_a3429" },
+                { label: "Cargo", value: showBlocked ? blockedDetails.cargo : "Auxiliar de secretaria" },
+                { label: "Unidade", value: showBlocked ? blockedDetails.origem : "EE Profª Maria Thétis Nunes" },
+                { label: "Matrícula", value: showBlocked ? blockedDetails.matricula : "SEMED-2026-04829" },
+                { label: "IP", value: showBlocked ? blockedDetails.ip : "200.150.42.18" },
+                { label: "Dispositivo", value: showBlocked ? blockedDetails.dispositivo : "Desktop Secretaria 03" },
+              ].map((item, i) => (
+                <div key={i}>
+                  <div className="mono-font" style={{ fontSize: 9, color: palette.textMuted, letterSpacing: "0.15em", marginBottom: 4 }}>{item.label.toUpperCase()}</div>
+                  <div style={{ fontSize: 12, color: palette.text, lineHeight: 1.4, wordBreak: "break-word" }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <AnimatePresence>
+            {showBlocked && (
+              <motion.div
+                initial={{ opacity: 0, y: 14, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.35 }}
+                style={{
+                  padding: 18,
+                  background: `linear-gradient(135deg, ${palette.danger}14, ${palette.warn}10)`,
+                  border: `1px solid ${palette.danger}66`,
+                  borderRadius: 14,
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                <div className="mono-font" style={{ fontSize: 9, color: palette.danger, letterSpacing: "0.25em", fontWeight: 800, marginBottom: 10 }}>
+                  ⚠ TENTATIVA FORA DO ESCOPO DETECTADA
+                </div>
+                <div style={{ fontSize: 18, color: palette.text, fontWeight: 700, marginBottom: 8 }}>
+                  Acesso bloqueado antes do retorno de dados
+                </div>
+                <div style={{ fontSize: 13, color: palette.textMuted, lineHeight: 1.6, marginBottom: 12 }}>
+                  O sistema comparou usuário, cargo, unidade, finalidade declarada e dado solicitado. A ação foi negada e transformada em evidência auditável.
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <span className="mono-font" style={{ fontSize: 10, color: "#fff", background: palette.danger, padding: "5px 9px", borderRadius: 6, letterSpacing: "0.12em" }}>RISCO {blockedDetails.risco}</span>
+                  <span className="mono-font" style={{ fontSize: 10, color: palette.danger, background: palette.danger + "18", padding: "5px 9px", borderRadius: 6, letterSpacing: "0.12em" }}>{blockedDetails.evidenciaId}</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* DUAL FEED: Escritas (Saúde) | Leituras (Educação/Saúde) */}
@@ -4009,9 +4168,13 @@ function AuditoriaDemo({ palette, openPortal }) {
                             { icon: "📍", label: "Origem", value: log.origem },
                             { icon: "🏛", label: "Local", value: log.bairro },
                             { icon: "👤", label: "Agente", value: `${log.agenteNome} (${log.cargo})` },
+                            { icon: "🎫", label: "Matrícula", value: log.matricula },
+                            { icon: "💻", label: "Dispositivo", value: log.dispositivo },
                             { icon: "🌐", label: "IP", value: log.ip },
                             { icon: "🆔", label: "Sessão", value: log.sessao },
+                            { icon: "🚦", label: "Risco", value: log.risco },
                             { icon: "📋", label: "Resp.", value: log.responsabilizacao },
+                            { icon: "🛡", label: "DPO", value: log.dpoAlerta },
                           ].map((d, idx) => (
                             <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
                               <span style={{ fontSize: 11, opacity: 0.8 }}>{d.icon}</span>
@@ -4036,6 +4199,63 @@ function AuditoriaDemo({ palette, openPortal }) {
                         }}>
                           ⚠ <strong>Motivo:</strong> {log.motivo}. A tentativa foi registrada permanentemente e pode ser usada como evidência em auditoria pela autoridade de proteção de dados.
                         </div>
+
+                        <button
+                          onClick={() => setShowEvidence((v) => !v)}
+                          style={{
+                            marginTop: 10,
+                            padding: "8px 12px",
+                            background: showEvidence ? palette.danger : "transparent",
+                            color: showEvidence ? "#fff" : palette.danger,
+                            border: `1px solid ${palette.danger}`,
+                            borderRadius: 8,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            letterSpacing: "0.12em",
+                            textTransform: "uppercase",
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                          }}
+                        >
+                          {showEvidence ? "Ocultar evidência" : "Ver evidência gerada"}
+                        </button>
+
+                        <AnimatePresence>
+                          {showEvidence && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, height: 0 }}
+                              animate={{ opacity: 1, y: 0, height: "auto" }}
+                              exit={{ opacity: 0, y: -6, height: 0 }}
+                              transition={{ duration: 0.3 }}
+                              style={{
+                                marginTop: 10,
+                                padding: 14,
+                                background: palette.bg,
+                                border: `1px solid ${palette.border}`,
+                                borderRadius: 10,
+                              }}
+                            >
+                              <div className="mono-font" style={{ fontSize: 9, color: palette.accent, letterSpacing: "0.22em", fontWeight: 700, marginBottom: 10 }}>
+                                REGISTRO DE AUDITORIA · {log.evidenciaId}
+                              </div>
+                              <div style={{ display: "grid", gap: 6, fontSize: 11 }}>
+                                {[
+                                  ["Hash do evento", log.hashEvento],
+                                  ["Status", "Imutável · gravado na trilha de auditoria"],
+                                  ["Origem", `${log.origem} · ${log.ip}`],
+                                  ["Usuário autenticado", `${log.agenteNome} · ${log.matricula}`],
+                                  ["Ação tentada", log.finalidade],
+                                  ["Resultado", `${log.statusHttp} · dado não retornado`],
+                                ].map(([label, value], idx) => (
+                                  <div key={idx} style={{ display: "grid", gridTemplateColumns: "130px 1fr", gap: 10 }}>
+                                    <span className="mono-font" style={{ color: palette.textMuted, fontSize: 9, letterSpacing: "0.1em" }}>{label.toUpperCase()}</span>
+                                    <span style={{ color: palette.text, lineHeight: 1.45 }}>{value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </motion.div>
                     )}
                   </motion.div>
@@ -4060,7 +4280,7 @@ function AuditoriaDemo({ palette, openPortal }) {
         }}>
           <div className="mono-font" style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em", display: "flex", alignItems: "center", gap: 8 }}>
             <Lock size={12} color={palette.accent} strokeWidth={1.6} />
-            REGISTRO IMUTÁVEL · hash: 7f3a9b2e8c4d...
+            REGISTRO IMUTÁVEL · hash: {showBlocked ? blockedDetails.hashEvento : "7f3a9b2e8c4d..."}
           </div>
           <div className="mono-font" style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em" }}>
             {registros.length} escritas · {allConsultas.length} leituras · {eventosBloqueados} bloqueio{eventosBloqueados !== 1 ? "s" : ""}
