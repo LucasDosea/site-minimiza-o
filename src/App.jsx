@@ -4550,6 +4550,7 @@ function DemonstracaoPratica({ palette }) {
   const [dataSelecionada, setDataSelecionada] = useState(null);
   const [horaSelecionada, setHoraSelecionada] = useState(null);
   const [protocolo, setProtocolo] = useState(null);
+  const [cpfInput, setCpfInput] = useState("");
 
   const exemplos = [
     {
@@ -4653,9 +4654,50 @@ function DemonstracaoPratica({ palette }) {
 
   const datasDisponiveis = gerarDatas();
 
+  const somenteNumeros = (valor) => String(valor || "").replace(/\D/g, "").slice(0, 11);
+
+  const formatarCpf = (valor) => {
+    const digits = somenteNumeros(valor);
+    const p1 = digits.slice(0, 3);
+    const p2 = digits.slice(3, 6);
+    const p3 = digits.slice(6, 9);
+    const p4 = digits.slice(9, 11);
+    if (digits.length <= 3) return p1;
+    if (digits.length <= 6) return `${p1}.${p2}`;
+    if (digits.length <= 9) return `${p1}.${p2}.${p3}`;
+    return `${p1}.${p2}.${p3}-${p4}`;
+  };
+
+  const cpfFormatado = formatarCpf(cpfInput);
+  const cpfCompleto = cpfInput.length === 11;
+
+  const digitarCpf = (numero) => {
+    setCpfInput((prev) => (prev.length < 11 ? prev + numero : prev));
+  };
+
+  const apagarCpf = () => {
+    setCpfInput((prev) => prev.slice(0, -1));
+  };
+
+  const limparCpf = () => {
+    setCpfInput("");
+  };
+
   const consultar = (cpfFromButton) => {
-    const cpf = cpfFromButton;
-    const found = exemplos.find(ex => ex.cpf === cpf);
+    const cpf = formatarCpf(cpfFromButton || cpfInput);
+    if (somenteNumeros(cpf).length !== 11) return;
+
+    const found = exemplos.find(ex => ex.cpf === cpf) || {
+      cpf,
+      nome: null,
+      idade: null,
+      status: "NÃO LOCALIZADO",
+      statusColor: palette.danger,
+      orientacao: "CPF não localizado nas bases demonstrativas consultadas. Família orientada a procurar a UBS para conferência cadastral.",
+      vacinas: [],
+    };
+
+    setCpfInput(somenteNumeros(cpf));
     setStep(1);
     setTimeout(() => {
       setResultado(found);
@@ -4679,6 +4721,7 @@ function DemonstracaoPratica({ palette }) {
     setDataSelecionada(null);
     setHoraSelecionada(null);
     setProtocolo(null);
+    setCpfInput("");
   };
 
   const iniciarAgendamento = () => {
@@ -4733,8 +4776,8 @@ function DemonstracaoPratica({ palette }) {
       <SectionHeader
         palette={palette}
         kicker="Demonstração prática · fluxo completo"
-        title="Mesma consulta. Duas visões. Um agendamento."
-        subtitle="Selecione um cidadão demonstrativo e veja o fluxo completo: consulta com visão dupla (família × escola), agendamento na UBS e atualização em tempo real."
+        title="Digite o CPF. O sistema consulta só o necessário."
+        subtitle="Simule a entrada do CPF no terminal escolar: o sistema pseudonimiza a consulta, retorna apenas o status necessário para a matrícula e registra tudo para auditoria."
       />
 
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -4773,12 +4816,144 @@ function DemonstracaoPratica({ palette }) {
                 ─ TERMINAL DE CONSULTA
               </div>
               <h3 className="display-font" style={{ fontSize: 28, fontWeight: 500, margin: "0 0 12px", letterSpacing: "-0.02em", position: "relative" }}>
-                Selecione um cidadão demonstrativo
+                Digite ou selecione um CPF demonstrativo
               </h3>
-              <p style={{ fontSize: 14, color: palette.textMuted, marginBottom: 32, lineHeight: 1.6, position: "relative" }}>
-                Cada CPF representa um cenário diferente. Você verá o que a família/UBS enxerga vs. o que a escola enxerga, e poderá agendar regularização quando aplicável.
+              <p style={{ fontSize: 14, color: palette.textMuted, marginBottom: 28, lineHeight: 1.6, position: "relative" }}>
+                Esta tela simula a entrada real no balcão da secretaria. O CPF é digitado, transformado em token seguro e a escola recebe apenas o status necessário — sem prontuário, doenças ou histórico clínico.
               </p>
 
+              <div style={{
+                position: "relative",
+                padding: 22,
+                background: palette.bg,
+                border: `1px solid ${palette.border}`,
+                borderRadius: 18,
+                marginBottom: 26,
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
+                  <div>
+                    <div className="mono-font" style={{ fontSize: 10, color: palette.primary, letterSpacing: "0.22em", fontWeight: 700, marginBottom: 6 }}>
+                      ─ ENTRADA DE CPF · CONSULTA CONTROLADA
+                    </div>
+                    <div style={{ fontSize: 13, color: palette.textMuted }}>
+                      Simulação de digitação no terminal da escola
+                    </div>
+                  </div>
+                  <div className="mono-font" style={{
+                    fontSize: 10,
+                    color: cpfCompleto ? palette.success : palette.textMuted,
+                    padding: "6px 10px",
+                    border: `1px solid ${cpfCompleto ? palette.success : palette.border}`,
+                    borderRadius: 999,
+                    letterSpacing: "0.16em",
+                    fontWeight: 700,
+                  }}>
+                    {cpfInput.length}/11 DÍGITOS
+                  </div>
+                </div>
+
+                <input
+                  value={cpfFormatado}
+                  onChange={(e) => setCpfInput(somenteNumeros(e.target.value))}
+                  placeholder="___.___.___-__"
+                  inputMode="numeric"
+                  maxLength={14}
+                  className="mono-font"
+                  style={{
+                    width: "100%",
+                    padding: "18px 20px",
+                    borderRadius: 14,
+                    border: `1px solid ${cpfCompleto ? palette.success : palette.border}`,
+                    background: palette.surface,
+                    color: palette.text,
+                    fontSize: "clamp(20px, 5vw, 32px)",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    outline: "none",
+                    textAlign: "center",
+                    marginBottom: 16,
+                  }}
+                />
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14 }}>
+                  {["1", "2", "3", "4", "5", "6", "7", "8", "9", "limpar", "0", "apagar"].map((tecla) => (
+                    <motion.button
+                      key={tecla}
+                      whileHover={{ y: -1 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => {
+                        if (tecla === "limpar") limparCpf();
+                        else if (tecla === "apagar") apagarCpf();
+                        else digitarCpf(tecla);
+                      }}
+                      style={{
+                        padding: tecla === "limpar" || tecla === "apagar" ? "12px 8px" : "14px 8px",
+                        background: tecla === "limpar" || tecla === "apagar" ? palette.surfaceAlt : palette.surface,
+                        color: tecla === "limpar" || tecla === "apagar" ? palette.textMuted : palette.text,
+                        border: `1px solid ${palette.border}`,
+                        borderRadius: 12,
+                        cursor: "pointer",
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: tecla === "limpar" || tecla === "apagar" ? 10 : 18,
+                        fontWeight: 700,
+                        letterSpacing: tecla === "limpar" || tecla === "apagar" ? "0.16em" : "0.02em",
+                        textTransform: tecla === "limpar" ? "uppercase" : "none",
+                      }}
+                    >
+                      {tecla === "apagar" ? "←" : tecla}
+                    </motion.button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => consultar()}
+                  disabled={!cpfCompleto}
+                  style={{
+                    width: "100%",
+                    display: "inline-flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "15px 20px",
+                    background: cpfCompleto ? palette.text : palette.surfaceAlt,
+                    color: cpfCompleto ? palette.bg : palette.textMuted,
+                    border: `1px solid ${cpfCompleto ? palette.text : palette.border}`,
+                    borderRadius: 12,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    cursor: cpfCompleto ? "pointer" : "not-allowed",
+                    opacity: cpfCompleto ? 1 : 0.65,
+                  }}
+                >
+                  <Search size={16} /> Consultar CPF
+                </button>
+
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                  gap: 10,
+                  marginTop: 16,
+                }}>
+                  {[
+                    { label: "Finalidade", value: "matrícula" },
+                    { label: "Retorno", value: "status mínimo" },
+                    { label: "Auditoria", value: "obrigatória" },
+                  ].map((item) => (
+                    <div key={item.label} style={{ padding: "10px 12px", background: palette.surfaceAlt, borderRadius: 10 }}>
+                      <div className="mono-font" style={{ fontSize: 9, color: palette.textMuted, letterSpacing: "0.18em", marginBottom: 4 }}>
+                        {item.label.toUpperCase()}
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: palette.text }}>{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mono-font" style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.18em", marginBottom: 12, fontWeight: 700, position: "relative" }}>
+                ─ ATALHOS PARA APRESENTAÇÃO
+              </div>
               <div style={{ display: "grid", gap: 10, position: "relative" }}>
                 {exemplos.map((ex, i) => (
                   <motion.button
@@ -4821,6 +4996,9 @@ function DemonstracaoPratica({ palette }) {
                       </div>
                       <div className="mono-font" style={{ fontSize: 10, color: ex.statusColor, letterSpacing: "0.2em", marginTop: 4, fontWeight: 700 }}>
                         ↳ {ex.status}
+                      </div>
+                      <div style={{ fontSize: 11, color: palette.textMuted, marginTop: 5 }}>
+                        Preenche o CPF e executa a consulta segura
                       </div>
                     </div>
                     <ArrowRight size={16} color={ex.statusColor} />
