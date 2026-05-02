@@ -2386,6 +2386,7 @@ function SolucaoProposta({ palette }) {
 function AntesDepois({ palette }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   const antes = ["Família imprime caderneta na UBS", "Levam papel à secretaria escolar", "Servidor confere visualmente", "Histórico clínico exposto", "Risco de extravio e fraude", "Múltiplas idas presenciais"];
   const depois = ["Saúde mantém registro digital", "Sistema calcula status objetivo", "Educação consulta apenas LIBERADO/PENDENTE", "Histórico clínico permanece na Saúde", "Auditoria automática de cada consulta", "Família resolve em um clique"];
@@ -2398,38 +2399,78 @@ function AntesDepois({ palette }) {
         title="Antes × Depois"
         subtitle="O mesmo objetivo — validar vacinação para matrícula — alcançado com menos atrito e mais privacidade."
       />
-      <div ref={ref} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 32 }}>
+      <div
+        ref={ref}
+        onMouseLeave={() => setHoveredCard(null)}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: 32,
+          perspective: 1200,
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
         {[{ data: antes, color: palette.danger, icon: X, title: "Modelo atual", subtitle: "Burocrático e exposto" }, { data: depois, color: palette.success, icon: Check, title: "Modelo proposto", subtitle: "Digital e minimizado" }].map((col, idx) => {
           const Icon = col.icon;
+          const isHovered = hoveredCard === idx;
+          const isOther = hoveredCard !== null && hoveredCard !== idx;
           return (
             <motion.div
               key={idx}
+              onMouseEnter={() => setHoveredCard(idx)}
               initial={{ opacity: 0, x: idx === 0 ? -30 : 30 }}
-              animate={inView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.7, delay: idx * 0.15 }}
+              animate={inView ? {
+                opacity: isOther ? 0.58 : 1,
+                x: 0,
+                y: isHovered ? -18 : 0,
+                scale: isHovered ? 1.055 : isOther ? 0.97 : 1,
+                rotateX: isHovered ? 2 : 0,
+                filter: isOther ? "blur(1.2px)" : "blur(0px)",
+              } : {}}
+              transition={{ duration: 0.45, delay: inView ? 0 : idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 padding: 36,
                 background: palette.surface,
-                border: `1px solid ${col.color}33`,
+                border: `1px solid ${isHovered ? col.color : col.color + "33"}`,
                 borderRadius: 24,
                 position: "relative",
+                zIndex: isHovered ? 10 : 1,
+                cursor: "pointer",
+                overflow: "hidden",
+                transformStyle: "preserve-3d",
+                boxShadow: isHovered ? `0 32px 80px -28px ${col.color}99` : "0 10px 30px -28px rgba(10, 22, 40, 0.25)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: col.color + "1a", color: col.color, display: "grid", placeItems: "center" }}>
+              <motion.div
+                animate={{ opacity: isHovered ? 1 : 0 }}
+                transition={{ duration: 0.35 }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: `linear-gradient(135deg, ${col.color}14, transparent 58%)`,
+                  pointerEvents: "none",
+                }}
+              />
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28, position: "relative", zIndex: 1 }}>
+                <motion.div
+                  animate={{ scale: isHovered ? 1.08 : 1, rotate: isHovered ? -3 : 0 }}
+                  transition={{ duration: 0.35 }}
+                  style={{ width: 44, height: 44, borderRadius: 12, background: col.color + "1a", color: col.color, display: "grid", placeItems: "center" }}
+                >
                   <Icon size={22} />
-                </div>
+                </motion.div>
                 <div>
                   <h3 className="display-font" style={{ fontSize: 24, fontWeight: 500, margin: 0 }}>{col.title}</h3>
                   <div style={{ fontSize: 13, color: palette.textMuted }}>{col.subtitle}</div>
                 </div>
               </div>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, position: "relative", zIndex: 1 }}>
                 {col.data.map((item, i) => (
                   <motion.li
                     key={i}
                     initial={{ opacity: 0, x: -10 }}
-                    animate={inView ? { opacity: 1, x: 0 } : {}}
+                    animate={inView ? { opacity: 1, x: isHovered ? 4 : 0 } : {}}
                     transition={{ duration: 0.4, delay: idx * 0.15 + i * 0.08 }}
                     style={{ display: "flex", gap: 12, padding: "10px 0", fontSize: 14, color: palette.text, borderBottom: i < col.data.length - 1 ? `1px solid ${palette.border}` : "none" }}
                   >
