@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useInView, useSpring 
 import { Shield, Activity, BookOpen, Database, Lock, FileCheck, Users, Building2, ArrowRight, Check, X, AlertCircle, ChevronUp, ChevronDown, Search, Eye, EyeOff, Sun, Moon, Play, Layers, GitBranch, FileText, Sparkles, TrendingDown, TrendingUp, Clock, Heart, GraduationCap, ShieldCheck, ScrollText } from "lucide-react";
 
 // ============================================
-// ImunizAju — Demo Visual Institucional
+// ImunizAju — Protótipo Institucional
 // ============================================
 
 export default function ImunizAjuSite() {
@@ -116,7 +116,7 @@ export default function ImunizAjuSite() {
       <ImpactoSocial palette={palette} />
       <CalculadoraEconomia palette={palette} />
       <ArquiteturaDemo palette={palette} />
-      <LimitesDemo palette={palette} />
+      <LimitesPrototipo palette={palette} />
       <Rodape palette={palette} />
 
       <BackToTop show={showBackTop} palette={palette} />
@@ -273,7 +273,7 @@ function NavBar({ palette, theme, setTheme }) {
         </div>
         <div style={{ lineHeight: 1.1 }}>
           <div className="display-font" style={{ fontSize: 18, fontWeight: 700 }}>ImunizAju</div>
-          <div style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em" }}>ARACAJU · DEMO</div>
+          <div style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em" }}>ARACAJU · IMUNIZAÇÃO DIGITAL</div>
         </div>
       </div>
 
@@ -1918,13 +1918,13 @@ function AuditLogsAnimation({ palette }) {
         </div>
         <div style={{ position: "relative", height: 160, overflow: "hidden" }}>
           {[
-            { ts: "14:02:11", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 0 },
-            { ts: "14:01:47", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 1.2 },
-            { ts: "14:00:30", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 2.4 },
-            { ts: "13:58:22", txt: "saude.ubs.demo · clínico", status: "OK", color: palette.success, delay: 3.6 },
-            { ts: "13:55:09", txt: "secescolar.demo · histórico", status: "BLOCK", color: palette.danger, delay: 4.8 },
-            { ts: "13:53:41", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 6 },
-            { ts: "13:51:28", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 7.2 },
+            { ts: "14:02:11", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 0 },
+            { ts: "14:01:47", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 1.2 },
+            { ts: "14:00:30", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 2.4 },
+            { ts: "13:58:22", txt: "saude.imunizaju · clínico", status: "OK", color: palette.success, delay: 3.6 },
+            { ts: "13:55:09", txt: "educacao.imunizaju · histórico", status: "BLOCK", color: palette.danger, delay: 4.8 },
+            { ts: "13:53:41", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 6 },
+            { ts: "13:51:28", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 7.2 },
           ].map((log, i) => (
             <div
               key={i}
@@ -3596,9 +3596,9 @@ function ArquiteturaDemo({ palette }) {
 }
 
 // ============================================
-// 16. LIMITES DA DEMO
+// 16. LIMITES DO PROTÓTIPO
 // ============================================
-function LimitesDemo({ palette }) {
+function LimitesPrototipo({ palette }) {
   const itens = [
     "Esta página é uma demonstração visual. Não é sistema oficial.",
     "Todos os dados, CPFs e nomes apresentados são fictícios.",
@@ -4848,7 +4848,7 @@ function Rodape({ palette }) {
               <div className="display-font" style={{ fontSize: 20, fontWeight: 600 }}>ImunizAju</div>
             </div>
             <p style={{ fontSize: 13, color: palette.textMuted, lineHeight: 1.6, margin: 0 }}>
-              Demonstração visual de governança digital aplicada à integração entre Saúde e Educação.
+              ImunizAju: governança digital aplicada à integração entre Saúde e Educação.
             </p>
           </div>
           <div>
@@ -4863,7 +4863,7 @@ function Rodape({ palette }) {
           <div>
             <h5 style={{ fontSize: 12, color: palette.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>Natureza</h5>
             <div style={{ display: "grid", gap: 8, fontSize: 13, color: palette.textMuted }}>
-              <span>Demonstração visual</span>
+              <span>ImunizAju</span>
               <span>Dados fictícios</span>
               <span>Não-oficial</span>
               <span>Conceitual</span>
@@ -4880,9 +4880,9 @@ function Rodape({ palette }) {
           </div>
         </div>
         <div style={{ paddingTop: 24, borderTop: `1px solid ${palette.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, fontSize: 12, color: palette.textMuted }}>
-          <div>© 2026 ImunizAju · Demo conceitual</div>
+          <div>© 2026 ImunizAju · Protótipo conceitual</div>
           <div style={{ display: "flex", gap: 16 }}>
-            <span>v0.1 demonstrativa</span>
+            <span>v1.0 protótipo</span>
             <span>·</span>
             <span>Sergipe, Brasil</span>
           </div>
@@ -5049,7 +5049,7 @@ function BackToTop({ show, palette }) {
       <ImpactoSocial palette={palette} />
       <CalculadoraEconomia palette={palette} />
       <ArquiteturaDemo palette={palette} />
-      <LimitesDemo palette={palette} />
+      <LimitesPrototipo palette={palette} />
       <Rodape palette={palette} />
 
       <BackToTop show={showBackTop} palette={palette} />
@@ -5208,7 +5208,7 @@ function NavBar({ palette, theme, setTheme }) {
         </div>
         <div style={{ lineHeight: 1.1 }}>
           <div className="display-font" style={{ fontSize: 18, fontWeight: 700 }}>ImunizAju</div>
-          <div style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em" }}>ARACAJU · DEMO</div>
+          <div style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em" }}>ARACAJU · IMUNIZAÇÃO DIGITAL</div>
         </div>
       </div>
 
@@ -6853,13 +6853,13 @@ function AuditLogsAnimation({ palette }) {
         </div>
         <div style={{ position: "relative", height: 160, overflow: "hidden" }}>
           {[
-            { ts: "14:02:11", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 0 },
-            { ts: "14:01:47", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 1.2 },
-            { ts: "14:00:30", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 2.4 },
-            { ts: "13:58:22", txt: "saude.ubs.demo · clínico", status: "OK", color: palette.success, delay: 3.6 },
-            { ts: "13:55:09", txt: "secescolar.demo · histórico", status: "BLOCK", color: palette.danger, delay: 4.8 },
-            { ts: "13:53:41", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 6 },
-            { ts: "13:51:28", txt: "secescolar.demo · matrícula", status: "OK", color: palette.success, delay: 7.2 },
+            { ts: "14:02:11", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 0 },
+            { ts: "14:01:47", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 1.2 },
+            { ts: "14:00:30", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 2.4 },
+            { ts: "13:58:22", txt: "saude.imunizaju · clínico", status: "OK", color: palette.success, delay: 3.6 },
+            { ts: "13:55:09", txt: "educacao.imunizaju · histórico", status: "BLOCK", color: palette.danger, delay: 4.8 },
+            { ts: "13:53:41", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 6 },
+            { ts: "13:51:28", txt: "educacao.imunizaju · matrícula", status: "OK", color: palette.success, delay: 7.2 },
           ].map((log, i) => (
             <div
               key={i}
@@ -8531,9 +8531,9 @@ function ArquiteturaDemo({ palette }) {
 }
 
 // ============================================
-// 16. LIMITES DA DEMO
+// 16. LIMITES DO PROTÓTIPO
 // ============================================
-function LimitesDemo({ palette }) {
+function LimitesPrototipo({ palette }) {
   const itens = [
     "Esta página é uma demonstração visual. Não é sistema oficial.",
     "Todos os dados, CPFs e nomes apresentados são fictícios.",
@@ -9783,7 +9783,7 @@ function Rodape({ palette }) {
               <div className="display-font" style={{ fontSize: 20, fontWeight: 600 }}>ImunizAju</div>
             </div>
             <p style={{ fontSize: 13, color: palette.textMuted, lineHeight: 1.6, margin: 0 }}>
-              Demonstração visual de governança digital aplicada à integração entre Saúde e Educação.
+              ImunizAju: governança digital aplicada à integração entre Saúde e Educação.
             </p>
           </div>
           <div>
@@ -9798,7 +9798,7 @@ function Rodape({ palette }) {
           <div>
             <h5 className="mono-font" style={{ fontSize: 11, color: palette.accent, letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>─ Natureza</h5>
             <div style={{ display: "grid", gap: 8, fontSize: 13, color: palette.textMuted }}>
-              <span>Demonstração visual</span>
+              <span>ImunizAju</span>
               <span>Dados fictícios</span>
               <span>Não-oficial</span>
               <span>Conceitual</span>
@@ -9815,9 +9815,9 @@ function Rodape({ palette }) {
           </div>
         </div>
         <div style={{ paddingTop: 24, borderTop: `1px solid ${palette.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, fontSize: 12, color: palette.textMuted }}>
-          <div>© 2026 ImunizAju · Demo conceitual</div>
+          <div>© 2026 ImunizAju · Protótipo conceitual</div>
           <div style={{ display: "flex", gap: 16 }}>
-            <span>v0.1 demonstrativa</span>
+            <span>v1.0 protótipo</span>
             <span>·</span>
             <span>Sergipe, Brasil</span>
           </div>
