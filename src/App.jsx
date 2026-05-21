@@ -280,7 +280,7 @@ function NavBar({ palette, theme, setTheme }) {
           <ShieldCheck size={18} color="#fff" />
         </div>
         <div style={{ lineHeight: 1.1 }}>
-          <div className="display-font" style={{ fontSize: 18, fontWeight: 700 }}>VacinaEdu</div>
+          <div className="display-font" style={{ fontSize: 18, fontWeight: 700 }}>ImunizAju</div>
           <div style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em" }}>ARACAJU · DEMO</div>
         </div>
       </div>
@@ -1592,7 +1592,7 @@ function NotebookPreviewAnimation({ palette }) {
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: palette.warn }} />
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: palette.success }} />
               <div className="mono-font" style={{ marginLeft: 12, fontSize: 8, color: palette.textMuted, letterSpacing: "0.1em" }}>
-                vacinaedu.gov.br/consulta
+                imunizaju.gov.br/consulta
               </div>
             </div>
 
@@ -3015,7 +3015,7 @@ function AuditoriaDemo({ palette, openPortal }) {
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: palette.success }} />
             </div>
             <div className="mono-font" style={{ fontSize: 12, fontWeight: 600, color: palette.text, letterSpacing: "0.05em" }}>
-              vacinaedu.gov.br/audit
+              imunizaju.gov.br/audit
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -4844,7 +4844,7 @@ function Rodape({ palette }) {
           marginBottom: 60,
           textAlign: "center",
         }}>
-          VacinaEdu
+          ImunizAju
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 40, marginBottom: 40 }}>
@@ -4853,7 +4853,7 @@ function Rodape({ palette }) {
               <div style={{ width: 36, height: 36, borderRadius: 8, background: `linear-gradient(135deg, ${palette.primary}, ${palette.primaryDeep})`, display: "grid", placeItems: "center" }}>
                 <ShieldCheck size={18} color="#fff" strokeWidth={1.5} />
               </div>
-              <div className="display-font" style={{ fontSize: 20, fontWeight: 600 }}>VacinaEdu Aracaju</div>
+              <div className="display-font" style={{ fontSize: 20, fontWeight: 600 }}>ImunizAju Aracaju</div>
             </div>
             <p style={{ fontSize: 13, color: palette.textMuted, lineHeight: 1.6, margin: 0 }}>
               Demonstração visual de governança digital aplicada à integração entre Saúde e Educação.
@@ -4888,7 +4888,7 @@ function Rodape({ palette }) {
           </div>
         </div>
         <div style={{ paddingTop: 24, borderTop: `1px solid ${palette.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, fontSize: 12, color: palette.textMuted }}>
-          <div>© 2026 VacinaEdu Aracaju · Demo conceitual</div>
+          <div>© 2026 ImunizAju Aracaju · Demo conceitual</div>
           <div style={{ display: "flex", gap: 16 }}>
             <span>v0.1 demonstrativa</span>
             <span>·</span>
@@ -5215,7 +5215,7 @@ function NavBar({ palette, theme, setTheme }) {
           <ShieldCheck size={18} color="#fff" />
         </div>
         <div style={{ lineHeight: 1.1 }}>
-          <div className="display-font" style={{ fontSize: 18, fontWeight: 700 }}>VacinaEdu</div>
+          <div className="display-font" style={{ fontSize: 18, fontWeight: 700 }}>ImunizAju</div>
           <div style={{ fontSize: 10, color: palette.textMuted, letterSpacing: "0.1em" }}>ARACAJU · DEMO</div>
         </div>
       </div>
@@ -6527,7 +6527,7 @@ function NotebookPreviewAnimation({ palette }) {
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: palette.warn }} />
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: palette.success }} />
               <div className="mono-font" style={{ marginLeft: 12, fontSize: 8, color: palette.textMuted, letterSpacing: "0.1em" }}>
-                vacinaedu.gov.br/consulta
+                imunizaju.gov.br/consulta
               </div>
             </div>
 
@@ -7950,7 +7950,7 @@ function AuditoriaDemo({ palette, openPortal }) {
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: palette.success }} />
             </div>
             <div className="mono-font" style={{ fontSize: 12, fontWeight: 600, color: palette.text, letterSpacing: "0.05em" }}>
-              vacinaedu.gov.br/audit
+              imunizaju.gov.br/audit
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -9779,7 +9779,7 @@ function Rodape({ palette }) {
           marginBottom: 60,
           textAlign: "center",
         }}>
-          VacinaEdu
+          ImunizAju
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 40, marginBottom: 40 }}>
@@ -9788,7 +9788,7 @@ function Rodape({ palette }) {
               <div style={{ width: 36, height: 36, borderRadius: 8, background: `linear-gradient(135deg, ${palette.primary}, ${palette.primaryDeep})`, display: "grid", placeItems: "center" }}>
                 <ShieldCheck size={18} color="#fff" strokeWidth={1.5} />
               </div>
-              <div className="display-font" style={{ fontSize: 20, fontWeight: 600 }}>VacinaEdu Aracaju</div>
+              <div className="display-font" style={{ fontSize: 20, fontWeight: 600 }}>ImunizAju Aracaju</div>
             </div>
             <p style={{ fontSize: 13, color: palette.textMuted, lineHeight: 1.6, margin: 0 }}>
               Demonstração visual de governança digital aplicada à integração entre Saúde e Educação.
@@ -9823,7 +9823,7 @@ function Rodape({ palette }) {
           </div>
         </div>
         <div style={{ paddingTop: 24, borderTop: `1px solid ${palette.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, fontSize: 12, color: palette.textMuted }}>
-          <div>© 2026 VacinaEdu Aracaju · Demo conceitual</div>
+          <div>© 2026 ImunizAju Aracaju · Demo conceitual</div>
           <div style={{ display: "flex", gap: 16 }}>
             <span>v0.1 demonstrativa</span>
             <span>·</span>
