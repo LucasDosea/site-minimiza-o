@@ -1442,6 +1442,25 @@ function Hero({ palette }) {
           >
             Ver dashboard
           </a>
+          <a href="#prototipo" style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "14px 28px",
+            background: `linear-gradient(135deg, ${palette.primary}, ${palette.primaryDeep})`,
+            color: "#fff",
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 600,
+            textDecoration: "none",
+            transition: "transform 0.2s, box-shadow 0.2s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 10px 30px -10px ${palette.primary}`; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+          >
+            <Play size={16} />
+            Ver protótipo
+          </a>
         </motion.div>
 
         {/* Stats inline */}
@@ -3833,7 +3852,7 @@ function DemonstracaoPratica({ palette }) {
   const podeAgendar = statusState && statusState !== "LIBERADO";
 
   return (
-    <SectionWrap palette={palette} id="demonstracao">
+    <SectionWrap palette={palette} id="prototipo">
       <SectionHeader
         palette={palette}
         kicker="Demonstração prática · fluxo completo"
