@@ -6,14 +6,6 @@ import { Shield, Activity, BookOpen, Database, Lock, FileCheck, Users, Building2
 // ImunizAju Aracaju — Demo Visual Institucional
 // ============================================
 
-export default function ImunizAjuSite() import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useInView, useSpring } from "framer-motion";
-import { Shield, Activity, BookOpen, Database, Lock, FileCheck, Users, Building2, ArrowRight, Check, X, AlertCircle, ChevronUp, ChevronDown, Search, Eye, EyeOff, Sun, Moon, Play, Layers, GitBranch, FileText, Sparkles, TrendingDown, TrendingUp, Clock, Heart, GraduationCap, ShieldCheck, ScrollText } from "lucide-react";
-
-// ============================================
-// ImunizAju Aracaju — Demo Visual Institucional
-// ============================================
-
 export default function ImunizAjuSite() {
   const [theme, setTheme] = useState("light");
   const [showBackTop, setShowBackTop] = useState(false);
