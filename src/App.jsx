@@ -575,7 +575,7 @@ function OriginalSitePrototypePreview({ p, result, statusColor, now }) {
             <span style={{ width: 9, height: 9, borderRadius: 99, background: p.red }} />
             <span style={{ width: 9, height: 9, borderRadius: 99, background: p.amber }} />
             <span style={{ width: 9, height: 9, borderRadius: 99, background: p.green }} />
-            <span style={{ marginLeft: 10, color: p.muted, fontSize: 10, fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}>imuinaju.demo/sistema</span>
+            <span style={{ marginLeft: 10, color: p.muted, fontSize: 10, fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}>imunizaju.demo/sistema</span>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1.05fr .95fr", gap: 12, padding: 16 }}>
@@ -1184,7 +1184,7 @@ export default function App() {
               <ShieldCheck color="white" />
             </motion.div>
             <div>
-              <strong>ImuinAju</strong>
+              <strong>ImunizAju</strong>
               <div style={{ fontSize: 11, color: p.muted, letterSpacing: ".14em" }}>PROTÓTIPO FINAL · INTERFACES</div>
             </div>
           </div>
