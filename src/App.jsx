@@ -100,18 +100,18 @@ export default function ImunizAjuSite() {
       <NavBar palette={palette} theme={theme} setTheme={setTheme} />
 
       <Hero palette={palette} />
-      <BigTypeTransition palette={palette} word="MINIMIZAR" subword="quanto menos dado circula, mais cidadão é respeitado" />
+      <BigTypeTransition palette={palette} word="MINIMIZAR" subword="quanto menos dado circula, mais cidadão é respeitado" colorKey="primary" />
       <ProblemaPublico palette={palette} />
       <SolucaoProposta palette={palette} />
       <AntesDepois palette={palette} />
       <FocusGallery palette={palette} />
       <FluxoSolucao palette={palette} />
-      <BigTypeTransition palette={palette} word="THRESHOLD" subword="o limiar entre o que se sabe e o que se mostra" />
-      <AlinhamentoDesafio palette={palette} />
+      <BigTypeTransition palette={palette} word="LIMIAR" subword="o ponto entre o que se sabe e o que se mostra" colorKey="accent" />
       <DashboardExecutivo palette={palette} />
       <DemonstracaoPratica palette={palette} />
       <LGPDMinimizacao palette={palette} openPortal={openPortalFn} />
-      <BigTypeTransition palette={palette} word="EVIDÊNCIA" subword="cada acesso registrado, cada finalidade declarada" />
+      <AlinhamentoDesafio palette={palette} />
+      <BigTypeTransition palette={palette} word="EVIDÊNCIA" subword="cada acesso registrado, cada finalidade declarada" colorKey="warn" />
       <AuditoriaDemo palette={palette} openPortal={openPortalFn} />
       <ImpactoSocial palette={palette} />
       <CalculadoraEconomia palette={palette} />
@@ -157,12 +157,14 @@ function NoiseOverlay() {
 // ============================================
 // BIG TYPE TRANSITION (palavra gigante entre seções)
 // ============================================
-function BigTypeTransition({ palette, word, subword }) {
+function BigTypeTransition({ palette, word, subword, colorKey = "accent" }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   // Range reduzido — letras não saem da tela
   const x = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+
+  const strokeColor = palette[colorKey] || palette.accent;
 
   return (
     <section
@@ -196,7 +198,7 @@ function BigTypeTransition({ palette, word, subword }) {
             lineHeight: 0.9,
             letterSpacing: "-0.05em",
             color: "transparent",
-            WebkitTextStroke: `1px ${palette.accent}`,
+            WebkitTextStroke: `1px ${strokeColor}`,
           }}
         >
           {word}
@@ -1530,10 +1532,10 @@ function NotebookPreviewAnimation({ palette }) {
         className="hide-on-mobile-anim"
         style={{
           position: "absolute",
-          top: "43%",
-          right: "2%",
-          width: 520,
-          opacity: 0.38,
+          top: "18%",
+          right: "-2%",
+          width: 580,
+          opacity: 0.55,
           pointerEvents: "none",
           animation: "notebook-float 6s ease-in-out infinite",
           transformOrigin: "center",
@@ -4861,7 +4863,7 @@ function Rodape({ palette }) {
             </div>
           </div>
           <div>
-            <h5 style={{ fontSize: 12, color: palette.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>Natureza</h5>
+            <h5 className="mono-font" style={{ fontSize: 11, color: palette.accent, letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>─ Natureza</h5>
             <div style={{ display: "grid", gap: 8, fontSize: 13, color: palette.textMuted }}>
               <span>Demonstração visual</span>
               <span>Dados fictícios</span>
@@ -4870,7 +4872,7 @@ function Rodape({ palette }) {
             </div>
           </div>
           <div>
-            <h5 style={{ fontSize: 12, color: palette.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>Princípios</h5>
+            <h5 className="mono-font" style={{ fontSize: 11, color: palette.accent, letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: 16, fontWeight: 600 }}>─ Princípios</h5>
             <div style={{ display: "grid", gap: 8, fontSize: 13, color: palette.textMuted }}>
               <span>Minimização de dados</span>
               <span>Auditoria contínua</span>
